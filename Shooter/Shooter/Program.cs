@@ -6,7 +6,7 @@ namespace Shooter
     {
         static void Main(string[] args)
         {
-            using (Game game = new Game(500, 500))
+            using (Game game = new Game(900, 700))
             {
                 game.Run();
             }
