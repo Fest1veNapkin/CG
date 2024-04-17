@@ -72,6 +72,8 @@ namespace Shooter
 
 
         public void InputController(KeyboardState input, MouseState mouse, FrameEventArgs e) {
+            /*
+             
             if (input.IsKeyDown(Keys.W))
             {
                 //do something if Key is pressed
@@ -102,7 +104,7 @@ namespace Shooter
                 //do something if Key is pressed
                 position.Y -= SPEED * (float)e.Time;
             }
-
+            */
             if (firstMove)
             {
                 lastPos = new Vector2(mouse.X, mouse.Y);

@@ -17,7 +17,7 @@ namespace Shooter.Graphics
             GL.BindVertexArray(ID);
         }
         
-        public void LinkTaVao(int location, int size, VBO vbo)
+        public void LinkToVAO(int location, int size, VBO vbo)
         {
             Bind();
             vbo.Bind();
