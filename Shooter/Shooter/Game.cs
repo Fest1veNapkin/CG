@@ -19,6 +19,8 @@ using System.Threading.Tasks;
 using Shooter.Graphics;
 using Shooter.Objects;
 using System.Diagnostics;
+using Microsoft.VisualBasic;
+using System.Reflection;
 
 namespace Shooter
 {
@@ -39,7 +41,7 @@ namespace Shooter
         
         float base_x, base_y, base_z;
         float user_x, user_y, user_z;
-        float v0 = 0, a = 9.81f, t = 0.001f, strong = 0, middle = 0;
+        float v0 = 0, dt = 0;
         // width and height of screen
         int width, height;
         // Constructor that sets the width, height, and calls the base constructor (GameWindow's Constructor) with default args
@@ -66,10 +68,10 @@ namespace Shooter
         {
             base.OnLoad();
 
-            user = new Block(new Vector3(-12f, -3f, -22f), "linux.jpg");
+            user = new Block(new Vector3(-12f, -2f, -22f), "linux.jpg");
             
             base_x = -12f; user_x = 0f;
-            base_y = -3f;  user_y = 0f;
+            base_y = -2f;  user_y = 0f;
             base_z = -22f; user_z = 0f;
 
             floor = new Wall(new Vector3(0f, -4f, -22f), 50f, 1f, 30f, "red.PNG");
@@ -145,16 +147,15 @@ namespace Shooter
                     enemies[enemy].Render(program);
                 }
             }
-            
-            if (strong > 1e-8)
+            if (user_x <= -10f || user_x <= -10f || user_x > 30 || user_y > 40)
+            {
+                reset();
+            }
+            if (!hit_wall(floor) && v0 != 0)
             { 
-                strong -= 0.01f;
-                user_x += 0.03f;
-                if (middle <= strong)
-                {
-                    user_y += 0.02f;
-                }
-                else user_y -= 0.02f;
+                dt += 0.01f;
+                user_x = v0 * 0.71f * 2 * dt;
+                user_y = v0 * 0.71f * 2* dt - 9.81f * dt * dt / 2f;
             }
             else
             {
@@ -162,8 +163,8 @@ namespace Shooter
             }
             hit_wall(wall);
             hit_block();
-
             update();
+            
             model = Matrix4.Identity;
             Matrix4 translation = Matrix4.CreateTranslation(user_x, user_y, user_z);
             model *= translation;
@@ -195,61 +196,18 @@ namespace Shooter
         }
 
 
-        protected void update()
-        {
-            KeyboardState input = KeyboardState;
-            if (strong < 1e-8)
-            {
-                if (input.IsKeyDown(Keys.D1))
-                {
-                    strong = 1;
-                }
-                if (input.IsKeyDown(Keys.D2))
-                {
-                    strong = 2;
-                }
-                if (input.IsKeyDown(Keys.D3))
-                {
-                    strong = 3;
-                }
-                if (input.IsKeyDown(Keys.D4))
-                {
-                    strong = 4;
-                }
-                if (input.IsKeyDown(Keys.D5))
-                {
-                    strong = 5;
-                }
-                if (input.IsKeyDown(Keys.D6))
-                {
-                    strong = 6;
-                }
-                if (input.IsKeyDown(Keys.D7))
-                {
-                    strong = 7;
-                }
-                if (input.IsKeyDown(Keys.D8))
-                {
-                    strong = 8;
-                }
-                if (input.IsKeyDown(Keys.D9))
-                {
-                    strong = 9;
-                }
-                middle = strong / 2;
-            }
-        }
+        
 
         protected void reset()
         {
             user_x = 0;
             user_y = 0;
             user_z = 0;
-            strong = 0f;
-            middle = 0f;
+            dt = 0f;
+            v0 = 0;
         }
 
-        protected void hit_wall(Wall wall)
+        protected bool hit_wall(Wall wall)
         {
             Vector3 user_pos = new Vector3(base_x + user_x, base_y + user_y, base_z + user_z),
                 wall_pos = wall.position;
@@ -258,7 +216,9 @@ namespace Shooter
                 Math.Abs(wall_pos.Y - user_pos.Y) <= (0.5 + wall.len_y / 2) )
             {
                 reset();
+                return true;
             }
+            return false;
         }
 
         protected void hit_block()
@@ -282,5 +242,50 @@ namespace Shooter
             }
 
         }
+
+        protected void update()
+        {
+            KeyboardState input = KeyboardState;
+            if (v0 < 1e-8)
+            {
+                if (input.IsKeyDown(Keys.D1))
+                {
+                    v0 = 1;
+                }
+                if (input.IsKeyDown(Keys.D2))
+                {
+                    v0 = 2;
+                }
+                if (input.IsKeyDown(Keys.D3))
+                {
+                    v0 = 3;
+                }
+                if (input.IsKeyDown(Keys.D4))
+                {
+                    v0 = 4;
+                }
+                if (input.IsKeyDown(Keys.D5))
+                {
+                    v0 = 5;
+                }
+                if (input.IsKeyDown(Keys.D6))
+                {
+                    v0 = 6;
+                }
+                if (input.IsKeyDown(Keys.D7))
+                {
+                    v0 = 7;
+                }
+                if (input.IsKeyDown(Keys.D8))
+                {
+                    v0 = 8;
+                }
+                if (input.IsKeyDown(Keys.D9))
+                {
+                    v0 = 9;
+                }
+            }
+        }
+
     }
 }
