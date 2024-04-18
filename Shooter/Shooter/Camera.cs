@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -72,53 +73,63 @@ namespace Shooter
 
 
         public void InputController(KeyboardState input, MouseState mouse, FrameEventArgs e) {
-            /*
-             
-            if (input.IsKeyDown(Keys.W))
-            {
-                //do something if Key is pressed
-                position += front * SPEED * (float)e.Time;
-            }
-            if (input.IsKeyDown(Keys.A))
-            {
-                //do something if Key is pressed
-                position -= right * SPEED * (float)e.Time;
-            }
-            if (input.IsKeyDown(Keys.S))
-            {
-                //do something if Key is pressed
-                position -= front * SPEED * (float)e.Time;
-            }
-            if (input.IsKeyDown(Keys.D))
-            {
-                //do something if Key is pressed
-                position += right * SPEED * (float)e.Time;
-            }
-            if (input.IsKeyDown(Keys.Space))
-            {
-                //do something if Key is pressed
-                position.Y += SPEED * (float)e.Time;
-            }
-            if (input.IsKeyDown(Keys.LeftShift))
-            {
-                //do something if Key is pressed
-                position.Y -= SPEED * (float)e.Time;
-            }
-            */
-            if (firstMove)
-            {
-                lastPos = new Vector2(mouse.X, mouse.Y);
-                firstMove = false;
-            }
-            else
-            {
-                var deltaX = mouse.X - lastPos.X;
-                var deltaY = mouse.Y - lastPos.Y;
-                lastPos = new Vector2(mouse.X, mouse.Y);
 
-                yaw += deltaX * SENSITIVITY * (float)e.Time;
-                pitch -= deltaY * SENSITIVITY * (float)e.Time;
+            bool w = true;
+            if (w)
+            {
+                if (input.IsKeyDown(Keys.W))
+                {
+                    //do something if Key is pressed
+                    position += front * SPEED * (float)e.Time;
+                }
+                if (input.IsKeyDown(Keys.A))
+                {
+                    //do something if Key is pressed
+                    position -= right * SPEED * (float)e.Time;
+                }
+                if (input.IsKeyDown(Keys.S))
+                {
+                    //do something if Key is pressed
+                    position -= front * SPEED * (float)e.Time;
+                }
+                if (input.IsKeyDown(Keys.D))
+                {
+                    //do something if Key is pressed
+                    position += right * SPEED * (float)e.Time;
+                }
+                if (input.IsKeyDown(Keys.Space))
+                {
+                    //do something if Key is pressed
+                    position.Y += SPEED * (float)e.Time;
+                }
+                if (input.IsKeyDown(Keys.LeftShift))
+                {
+                    //do something if Key is pressed
+                    position.Y -= SPEED * (float)e.Time;
+                }
+                
+
+
+                if (firstMove)
+                {
+                    lastPos = new Vector2(mouse.X, mouse.Y);
+                    firstMove = false;
+                }
+                else
+                {
+                    var deltaX = mouse.X - lastPos.X;
+                    var deltaY = mouse.Y - lastPos.Y;
+                    lastPos = new Vector2(mouse.X, mouse.Y);
+
+                    yaw += deltaX * SENSITIVITY * (float)e.Time;
+                    pitch -= deltaY * SENSITIVITY * (float)e.Time;
+                }
+                
             }
+
+
+
+
 
             UpdateVectors();
 

@@ -23,40 +23,40 @@ namespace Shooter.Objects
         IBO ibo;
         Texture texture;
 
-        public BackGround(Vector3 position_)
+        public BackGround(Vector3 position_, string texture_name)
         {
             position = position_;
             List<Vector3> raw_vertices = new List<Vector3>()
             {
-                new Vector3(-20f, 20f, -40f), // topleft vert
-                new Vector3(20f, 20f, -40f), // topright vert
-                new Vector3(20f, -20f, -40f), // bottomright vert
-                new Vector3(-20f, -20f, -40f), // bottomleft vert
+                new Vector3(-40f, 40f, -40f), // topleft vert
+                new Vector3(40f, 40f, -40f), // topright vert
+                new Vector3(40f, -40f, -40f), // bottomright vert
+                new Vector3(-40f, -40f, -40f), // bottomleft vert
                 // right face
-                new Vector3(20f, 20f, -40f), // topleft vert
-                new Vector3(20f, 20f, -70f), // topright vert
-                new Vector3(20f, -20f, -70f), // bottomright vert
-                new Vector3(20f, -20f, -40f), // bottomleft vert
+                new Vector3(40f, 40f, -40f), // topleft vert
+                new Vector3(40f, 40f, -70f), // topright vert
+                new Vector3(40f, -40f, -70f), // bottomright vert
+                new Vector3(40f, -40f, -40f), // bottomleft vert
                 // back face
-                new Vector3(20f, 20f, -70f), // topleft vert
-                new Vector3(-20f, 20f, -70f), // topright vert
-                new Vector3(-20f, -20f, -70f), // bottomright vert
-                new Vector3(20f, -20f, -70f), // bottomleft vert
+                new Vector3(40f, 40f, -70f), // topleft vert
+                new Vector3(-40f, 40f, -70f), // topright vert
+                new Vector3(-40f, -40f, -70f), // bottomright vert
+                new Vector3(40f, -40f, -70f), // bottomleft vert
                 // left face
-                new Vector3(-20f, 20f, -70f), // topleft vert
-                new Vector3(-20f, 20f, -40f), // topright vert
-                new Vector3(-20f, -20f, -40f), // bottomright vert
-                new Vector3(-20f, -20f, -70f), // bottomleft vert
+                new Vector3(-40f, 40f, -70f), // topleft vert
+                new Vector3(-40f, 40f, -40f), // topright vert
+                new Vector3(-40f, -40f, -40f), // bottomright vert
+                new Vector3(-40f, -40f, -70f), // bottomleft vert
                 // top face
-                new Vector3(-20f, 20f, -70f), // topleft vert
-                new Vector3(20f, 20f, -70f), // topright vert
-                new Vector3(20f, 20f, -40f), // bottomright vert
-                new Vector3(-20f, 20f, -40f), // bottomleft vert
+                new Vector3(-40f, 40f, -70f), // topleft vert
+                new Vector3(40f, 40f, -70f), // topright vert
+                new Vector3(40f, 40f, -40f), // bottomright vert
+                new Vector3(-40f, 40f, -40f), // bottomleft vert
                 // bottom face
-                new Vector3(-20f, -20f, -40f), // topleft vert
-                new Vector3(20f, -20f, -40f), // topright vert
-                new Vector3(20f, -20f, -70f), // bottomright vert
-                new Vector3(-20f, -20f, -70f), // bottomleft vert
+                new Vector3(-40f, -40f, -40f), // topleft vert
+                new Vector3(40f, -40f, -40f), // topright vert
+                new Vector3(40f, -40f, -70f), // bottomright vert
+                new Vector3(-40f, -40f, -70f), // bottomleft vert
             };
             uv = new List<Vector2>()
             {
@@ -120,7 +120,7 @@ namespace Shooter.Objects
             vert_vbo = new VBO(vertices);
             ibo = new IBO(ids);
             uv_vbo = new VBO(uv);
-            texture = new Texture("wall.PNG");
+            texture = new Texture(texture_name);
             Build();
         }
 
@@ -169,7 +169,7 @@ namespace Shooter.Objects
         Texture texture;
 
 
-        public Block(Vector3 position_)
+        public Block(Vector3 position_, string texture_name)
         {
             position = position_;
 
@@ -267,7 +267,7 @@ namespace Shooter.Objects
             vert_vbo = new VBO(vertices);
             ibo = new IBO(ids);
             uv_vbo = new VBO(uv);
-            texture = new Texture("kasp.PNG");
+            texture = new Texture(texture_name);
             Build();
         }
 
@@ -314,8 +314,13 @@ namespace Shooter.Objects
         IBO ibo;
         Texture texture;
 
-        public Wall(Vector3 position_, float len_x, float len_y, float len_z)
+        public float len_x, len_y, len_z;
+        public Wall(Vector3 position_, float len_x_, float len_y_, float len_z_, string texture_name)
         {
+            len_x = len_x_;
+            len_y = len_y_;
+            len_z = len_z_;
+
             position = position_;
             uv = new List<Vector2>()
             {
@@ -369,7 +374,7 @@ namespace Shooter.Objects
                 20, 21, 22,
                 22, 23, 20
             };
-            Block block = new Objects.Block(new Vector3(0, 0, 0));
+            Block block = new Objects.Block(new Vector3(0, 0, 0), texture_name);
 
             foreach (var vert in block.vertices)
             {
@@ -394,12 +399,12 @@ namespace Shooter.Objects
             vert_vbo = new VBO(vertices);
             ibo = new IBO(ids);
             uv_vbo = new VBO(uv);
-            texture = new Texture("kasp.PNG");
+            texture = new Texture(texture_name);
             Build();
         }
         public void Build()
         {
-
+            
             vao.Bind();
             vert_vbo.Bind();
 
