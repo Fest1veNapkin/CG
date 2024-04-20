@@ -41,6 +41,7 @@ namespace Shooter
         
         float base_x, base_y, base_z;
         float user_x, user_y, user_z;
+        float extra_x = 0f, extra_y = 0f, extra_z = 0f;
         float v0 = 0, dt = 0;
         // width and height of screen
         int width, height;
@@ -74,15 +75,15 @@ namespace Shooter
             base_y = -2f;  user_y = 0f;
             base_z = -22f; user_z = 0f;
 
-            floor = new Wall(new Vector3(0f, -4f, -22f), 50f, 1f, 30f, "red.PNG");
-            background = new BackGround(new Vector3(0, 0, 0), "red.PNG");
-            wall = new Wall(new Vector3(0f, -1f ,-22f), 4f, 6f, 10f, "hgd.PNG");
+            floor = new Wall(new Vector3(0f, -4f, -22f), 50f, 1f, 30f, "windows.PNG");
+            background = new BackGround(new Vector3(0, 10, 0), "windows.PNG");
+            wall = new Wall(new Vector3(0f, -1f ,-22f), 4f, 6f, 10f, "android.PNG");
 
-            for (float i = -5f; i < 6; i+=1f)
+            for (float i = -5f; i < 4; i+=1f)
             {
                 for (float j = -5; j < 5; j+=1)
                 {
-                    Block enemy = new Block(new Vector3(12f, -3f + j, -22f + i), "apple.jpg");
+                    Block enemy = new Block(new Vector3(12f + i, -3f + j, -22f), "apple.jpg");
                     enemies.Add(enemy);
                     was.Add(true);
                 }
@@ -147,26 +148,22 @@ namespace Shooter
                     enemies[enemy].Render(program);
                 }
             }
-            if (user_x <= -10f || user_x <= -10f || user_x > 30 || user_y > 40)
+            if (user_x <= -20f || user_x <= -20f || user_x > 50 || user_y > 50)
             {
                 reset();
             }
             if (!hit_wall(floor) && v0 != 0)
             { 
                 dt += 0.01f;
-                user_x = v0 * 0.71f * 2 * dt;
+                user_x = v0 * 0.71f * 2 * dt; 
                 user_y = v0 * 0.71f * 2* dt - 9.81f * dt * dt / 2f;
-            }
-            else
-            {
-                reset();
             }
             hit_wall(wall);
             hit_block();
             update();
             
             model = Matrix4.Identity;
-            Matrix4 translation = Matrix4.CreateTranslation(user_x, user_y, user_z);
+            Matrix4 translation = Matrix4.CreateTranslation(user_x + extra_x, user_y + extra_y, user_z);
             model *= translation;
 
             modelLocation = GL.GetUniformLocation(program.ID, "model");
@@ -203,13 +200,16 @@ namespace Shooter
             user_x = 0;
             user_y = 0;
             user_z = 0;
+            extra_x = 0;
+            extra_y = 0;
+            extra_z = 0;
             dt = 0f;
             v0 = 0;
         }
 
         protected bool hit_wall(Wall wall)
         {
-            Vector3 user_pos = new Vector3(base_x + user_x, base_y + user_y, base_z + user_z),
+            Vector3 user_pos = new Vector3(base_x + user_x + extra_x, base_y + user_y + extra_y, base_z + user_z + extra_z),
                 wall_pos = wall.position;
             
             if (Math.Abs(wall_pos.X -  user_pos.X) <= (0.5 + wall.len_x/2) &&
@@ -223,7 +223,7 @@ namespace Shooter
 
         protected void hit_block()
         {
-            Vector3 user_pos = new Vector3(base_x + user_x, base_y + user_y, base_z + user_z);
+            Vector3 user_pos = new Vector3(base_x + user_x + extra_x, base_y + user_y + extra_y, base_z + user_z + extra_z);
 
             for (int enemy = 0; enemy < enemies.Count; enemy++)
             {
@@ -246,6 +246,11 @@ namespace Shooter
         protected void update()
         {
             KeyboardState input = KeyboardState;
+            if (input.IsKeyDown(Keys.Escape))
+            {
+                // -- stop --
+                Close();
+            }
             if (v0 < 1e-8)
             {
                 if (input.IsKeyDown(Keys.D1))
@@ -283,6 +288,26 @@ namespace Shooter
                 if (input.IsKeyDown(Keys.D9))
                 {
                     v0 = 9;
+                }
+                if (input.IsKeyDown(Keys.D))
+                {
+                    //do something if Key is pressed
+                    extra_x += 0.01f;
+                }
+                if (input.IsKeyDown(Keys.A))
+                {
+                    //do something if Key is pressed
+                    extra_x -= 0.01f;
+                }
+                if (input.IsKeyDown(Keys.W))
+                {
+                    //do something if Key is pressed
+                    extra_y += 0.01f;
+                }
+                if (input.IsKeyDown(Keys.S))
+                {
+                    //do something if Key is pressed
+                    extra_y -= 0.01f;
                 }
             }
         }

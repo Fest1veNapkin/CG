@@ -74,7 +74,7 @@ namespace Shooter
 
         public void InputController(KeyboardState input, MouseState mouse, FrameEventArgs e) {
 
-            bool w = true;
+            bool w = false;
             if (w)
             {
                 if (input.IsKeyDown(Keys.W))
