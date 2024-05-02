@@ -13,7 +13,7 @@ namespace Shooter
 {
     internal class Camera
     {
-
+        private bool w = false;
         private float SPEED = 8f;
         private float SCREENWIDTH;
         private float SCREENHEIGHT;
@@ -74,9 +74,13 @@ namespace Shooter
 
         public void InputController(KeyboardState input, MouseState mouse, FrameEventArgs e) {
 
-            bool w = false;
-            if (w)
+            
+            if (input.IsKeyDown(Keys.G))
             {
+                w = !w;
+            }
+            if (w)
+            { 
                 if (input.IsKeyDown(Keys.W))
                 {
                     //do something if Key is pressed

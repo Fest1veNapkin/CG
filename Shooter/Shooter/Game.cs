@@ -29,16 +29,18 @@ namespace Shooter
     {
         Block user;
         BackGround background;
+        BackGround win, lose;
         Wall floor, wall;
         List<Block> enemies = new List<Block>();
         List<bool> was = new List<bool>();
+        int active = 0, counter = 1000;
         ShaderProgram program;
         // camera 
         Camera camera;
         // transform vars
         float yRot = 0f;
-        
-        
+
+        bool need_update = true;
         float base_x, base_y, base_z;
         float user_x, user_y, user_z;
         float extra_x = 0f, extra_y = 0f, extra_z = 0f;
@@ -69,27 +71,42 @@ namespace Shooter
         {
             base.OnLoad();
 
-            user = new Block(new Vector3(-12f, -2f, -22f), "linux.jpg");
-            
             base_x = -12f; user_x = 0f;
-            base_y = -2f;  user_y = 0f;
+            base_y = -1f;  user_y = 0f;
             base_z = -22f; user_z = 0f;
+            
+            user = new Block(new Vector3(base_x, base_y, base_z), "linux.jpg");
+            
 
-            floor = new Wall(new Vector3(0f, -4f, -22f), 50f, 1f, 30f, "windows.PNG");
+            floor = new Wall(new Vector3(0f, -3f, -22f), 60f, 1f, 36f, "windows.PNG");
             background = new BackGround(new Vector3(0, 10, 0), "windows.PNG");
-            wall = new Wall(new Vector3(0f, -1f ,-22f), 4f, 6f, 10f, "android.PNG");
+            lose = new BackGround(new Vector3(0, 0, -20), "defeat.jpg");
+            win = new BackGround(new Vector3(0, 0, -20), "win.jpg");
+            wall = new Wall(new Vector3(-3f, 0.5f ,-22f), 2f, 6f, 10f, "android.PNG");
 
-            for (float i = -5f; i < 4; i+=1f)
+            for (float i = -4f; i <= 4; i+=1f)
             {
-                for (float j = -5; j < 5; j+=1)
+                for (float j = -4; j <= 4; j+=1)
                 {
-                    Block enemy = new Block(new Vector3(12f + i, -3f + j, -22f), "apple.jpg");
+                    float distance = (float)Math.Sqrt(i * i + j * j);
+                    if (distance > 4) continue;
+                    Block enemy = new Block(new Vector3(11f + i, 2f + j, -22f), "apple.jpg");
                     enemies.Add(enemy);
                     was.Add(true);
                 }
             }
-
-
+            for (float i = -2f; i <= 0; i += 1f)
+            {
+                for (float j = 0; j <= 2; j += 1)
+                {
+                    float distance = (float)Math.Sqrt(i * i + j * j);
+                    if (distance > 2) continue;
+                    Block enemy = new Block(new Vector3(4f + i, 1f + j, -22f), "compm.jpg");
+                    enemies.Add(enemy);
+                    was.Add(true);
+                }
+            }
+            active = enemies.Count();
             program = new ShaderProgram("Default.vert", "Default.frag");
 
             GL.Enable(EnableCap.DepthTest);
@@ -155,13 +172,13 @@ namespace Shooter
             if (!hit_wall(floor) && v0 != 0)
             { 
                 dt += 0.01f;
-                user_x = v0 * 0.71f * 2 * dt; 
-                user_y = v0 * 0.71f * 2* dt - 9.81f * dt * dt / 2f;
+                user_x = v0 * 0.5f * 2 * dt; 
+                user_y = v0 * 0.9f * 2* dt - 9.81f * dt * dt / 2f;
             }
             hit_wall(wall);
             hit_block();
             update();
-            
+
             model = Matrix4.Identity;
             Matrix4 translation = Matrix4.CreateTranslation(user_x + extra_x, user_y + extra_y, user_z);
             model *= translation;
@@ -178,7 +195,6 @@ namespace Shooter
 
             // swap the buffers
             Context.SwapBuffers();
-
             base.OnRenderFrame(args);
 
             
@@ -237,6 +253,7 @@ namespace Shooter
                     {
                         reset();
                         was[enemy] = false;
+                        active--;
                     }
                 }
             }
@@ -246,48 +263,50 @@ namespace Shooter
         protected void update()
         {
             KeyboardState input = KeyboardState;
-            if (input.IsKeyDown(Keys.Escape))
+            
+            if (input.IsKeyDown(Keys.J))
             {
-                // -- stop --
-                Close();
+                need_update = !need_update;
             }
+            if (!need_update) return;
+            
             if (v0 < 1e-8)
             {
                 if (input.IsKeyDown(Keys.D1))
                 {
-                    v0 = 1;
+                    v0 = 1; counter--;
                 }
                 if (input.IsKeyDown(Keys.D2))
                 {
-                    v0 = 2;
+                    v0 = 2; counter--;
                 }
                 if (input.IsKeyDown(Keys.D3))
                 {
-                    v0 = 3;
+                    v0 = 3; counter--;
                 }
                 if (input.IsKeyDown(Keys.D4))
                 {
-                    v0 = 4;
+                    v0 = 4; counter--;
                 }
                 if (input.IsKeyDown(Keys.D5))
                 {
-                    v0 = 5;
+                    v0 = 5; counter--;
                 }
                 if (input.IsKeyDown(Keys.D6))
                 {
-                    v0 = 6;
+                    v0 = 6; counter--;
                 }
                 if (input.IsKeyDown(Keys.D7))
                 {
-                    v0 = 7;
+                    v0 = 7; counter--;
                 }
                 if (input.IsKeyDown(Keys.D8))
                 {
-                    v0 = 8;
+                    v0 = 8; counter--;
                 }
                 if (input.IsKeyDown(Keys.D9))
                 {
-                    v0 = 9;
+                    v0 = 9; counter--;
                 }
                 if (input.IsKeyDown(Keys.D))
                 {
@@ -310,7 +329,48 @@ namespace Shooter
                     extra_y -= 0.01f;
                 }
             }
-        }
 
+            if (input.IsKeyDown(Keys.Escape) || (((counter == 0) || (active == 0)) && (v0 < 1e-8)))
+            {
+                // -- stop --
+                if (active == 0 || counter == 0)
+                {
+                    int flag = 1000;
+                    while (flag > 0)
+                    {
+                        flag--;
+                        GL.ClearColor(0f, 0f, 0f, 1f);
+                        // Fill the screen with the color
+                        GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+
+                        // transformation matrices
+                        Matrix4 model = Matrix4.Identity;
+                        Matrix4 view = camera.getViewMatrix();
+                        Matrix4 projection = camera.GetProjectionMatrix();
+
+
+                        int modelLocation = GL.GetUniformLocation(program.ID, "model");
+                        int viewLocation = GL.GetUniformLocation(program.ID, "view");
+                        int projectionLocation = GL.GetUniformLocation(program.ID, "projection");
+
+                        GL.UniformMatrix4(modelLocation, true, ref model);
+                        GL.UniformMatrix4(viewLocation, true, ref view);
+                        GL.UniformMatrix4(projectionLocation, true, ref projection);
+                        
+                        if(active == 0)
+                        {
+                            win.Render(program);
+                        }
+                        else
+                        {
+                            lose.Render(program);
+                        }
+
+                        Context.SwapBuffers();
+                    }
+                } 
+                Close();
+            }
+        }
     }
 }
