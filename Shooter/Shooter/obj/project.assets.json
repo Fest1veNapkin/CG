@@ -437,7 +437,7 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\М.Видео\\.nuget\\packages\\": {}
+    "C:\\Users\\AI\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
@@ -445,11 +445,11 @@
       "projectUniqueName": "D:\\CG\\CG\\Shooter\\Shooter\\Shooter.csproj",
       "projectName": "Shooter",
       "projectPath": "D:\\CG\\CG\\Shooter\\Shooter\\Shooter.csproj",
-      "packagesPath": "C:\\Users\\М.Видео\\.nuget\\packages\\",
+      "packagesPath": "C:\\Users\\AI\\.nuget\\packages\\",
       "outputPath": "D:\\CG\\CG\\Shooter\\Shooter\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\М.Видео\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\AI\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
