@@ -33,6 +33,9 @@ namespace Shooter.Graphics
 
             // Link the program to OpenGL
             GL.LinkProgram(ID);
+            int status = 0;
+            GL.GetProgram(ID, GetProgramParameterName.LinkStatus, out status);
+            Console.WriteLine(GL.GetProgramInfoLog(ID));
 
             // delete the shaders
             GL.DeleteShader(vertexShader);

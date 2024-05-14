@@ -13,7 +13,7 @@ namespace Shooter
 {
     internal class Camera
     {
-        private bool w = false;
+        private bool w = true;
         private float SPEED = 8f;
         private float SCREENWIDTH;
         private float SCREENHEIGHT;
@@ -26,8 +26,8 @@ namespace Shooter
         Vector3 front = -Vector3.UnitZ;
 
         // --- view rotations ---
-        private float pitch;
-        private float yaw = -90.0f;
+        private float pitch = -10;
+        private float yaw = 90;
 
         private bool firstMove = true;
         public Vector2 lastPos;
@@ -111,7 +111,7 @@ namespace Shooter
                     //do something if Key is pressed
                     position.Y -= SPEED * (float)e.Time;
                 }
-                
+
 
 
                 if (firstMove)
@@ -128,7 +128,7 @@ namespace Shooter
                     yaw += deltaX * SENSITIVITY * (float)e.Time;
                     pitch -= deltaY * SENSITIVITY * (float)e.Time;
                 }
-                
+
             }
 
 

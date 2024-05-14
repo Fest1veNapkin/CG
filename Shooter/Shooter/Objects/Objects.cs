@@ -410,4 +410,58 @@ namespace Shooter.Objects
             vertices[1] = new Vector3(bas.X, (float)Math.Tan(angle) * bas.Y, bas.Z);
         }
     }
+
+    internal class RayTracing
+    {
+
+
+        public Vector3 position;
+        public List<Vector3> vertices = new List<Vector3>();
+        public List<uint> ids;
+        VAO vao;
+        VBO vert_vbo;
+        IBO ibo;
+        public RayTracing(Vector3 position_, string texture_name)
+        {
+            vertices = new List<Vector3>()
+            {
+                new Vector3(-1f, 1f, 0f) + position_,
+                new Vector3( 1f, 1f, 0f) + position_,
+                new Vector3( 1f, -1f, 0f) + position_,
+                new Vector3(-1f, -1f, 0f) + position_
+            };
+            position = position_;
+            ids = new List<uint>()
+            {
+                0, 1, 2,
+                2, 3, 0
+            };
+            vao = new VAO();
+            ibo = new IBO(ids);
+            vert_vbo = new VBO(vertices);
+            Build();
+        }
+        public void Build()
+        {
+
+            vao.Bind();
+            vert_vbo.Bind();
+            vao.LinkToVAO(0, 3, vert_vbo);   
+        }
+        public void Render(ShaderProgram program) // drawing the chunk
+        {
+            program.Bind();
+            Build();
+            vao.Bind();
+            ibo.Bind();
+            //texture.Bind();
+            GL.DrawElements(PrimitiveType.Triangles, ids.Count, DrawElementsType.UnsignedInt, 0);
+        }
+        public void Delete()
+        {
+            vao.Delete();
+            vert_vbo.Delete();
+            ibo.Delete();
+        }
+    }
 }
