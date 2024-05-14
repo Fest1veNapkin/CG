@@ -13,7 +13,7 @@ namespace Shooter
 {
     internal class Camera
     {
-        private bool w = true;
+        private bool w = false;
         private float SPEED = 8f;
         private float SCREENWIDTH;
         private float SCREENHEIGHT;
@@ -26,7 +26,7 @@ namespace Shooter
         Vector3 front = -Vector3.UnitZ;
 
         // --- view rotations ---
-        private float pitch = -10;
+        private float pitch = 0;
         private float yaw = 90;
 
         private bool firstMove = true;

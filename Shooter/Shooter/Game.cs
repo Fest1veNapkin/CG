@@ -67,7 +67,7 @@ namespace Shooter
             program = new ShaderProgram("Default.vert", "Default.frag");
 
             GL.Enable(EnableCap.DepthTest);
-            camera = new Camera(width, height, new Vector3(0f, 0f, -5f));
+            camera = new Camera(width, height, new Vector3(0f, 0f, -2f));
             CursorState = CursorState.Grabbed;
             
         }
