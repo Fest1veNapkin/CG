@@ -26,6 +26,20 @@ namespace Shooter.Graphics
             int fragmentShader = GL.CreateShader(ShaderType.FragmentShader);
             GL.ShaderSource(fragmentShader, LoadShaderSource(fragmentShaderFilepath));
             GL.CompileShader(fragmentShader);
+            GL.GetShader(fragmentShader, ShaderParameter.CompileStatus, out int a);
+
+            GL.GetShader(vertexShader, ShaderParameter.CompileStatus, out int d);
+            if (d == 0)
+            {
+                string infoLog = GL.GetShaderInfoLog(vertexShader);
+                System.Console.WriteLine(infoLog);
+            }
+
+            if (a == 0)
+            {
+                string infoLog = GL.GetShaderInfoLog(fragmentShader);
+                System.Console.WriteLine(infoLog);
+            }
 
             // Attach the shaders to the shader program
             GL.AttachShader(ID, vertexShader);
