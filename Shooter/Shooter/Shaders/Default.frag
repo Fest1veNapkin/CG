@@ -4,9 +4,9 @@ in vec3 glPosition;
 out vec4 FragColor;
 #define EPSILON 0.001
 #define BIG 1000000.0
-const int DIFFUSE = 1;
-const int REFLECTION = 2;
-const int REFRACTION = 3;
+#define MAX_RAY_DEPTH 10
+const int DIFFUSE_REFLECTION = 1;
+const int MIRROR_REFLECTION = 2;
 
 // -------- objects -----------
 struct SCamera
@@ -18,12 +18,19 @@ struct SCamera
 	vec2 Scale;
 };
 
+
 struct SRay
 {
 	vec3 Origin;
 	vec3 Direction;
 };
 
+struct STracingRay
+{
+	SRay ray;
+	float contribution;
+	int depth;
+};
 
 SRay GenerateRay ( SCamera uCamera )
 {
@@ -238,43 +245,43 @@ bool IntersectTriangle (SRay ray, vec3 v1, vec3 v2, vec3 v3, out float time )
 void initializeDefaultLightMaterials()
 {
 	uLight.Position = vec3(0.0, 2.0, -4.0f);
-	vec4 lightCoefs = vec4(0.4,0.9,0.5,512.0);
+	vec4 lightCoefs = vec4(1,0.5,1,2.0);
 
 	materials[0].Color = vec3(0, 1.0, 0);
 	materials[0].LightCoeffs = vec4(lightCoefs);
 	materials[0].ReflectionCoef = 0.5;
 	materials[0].RefractionCoef = 1.0;
-	materials[0].MaterialType = DIFFUSE;
+	materials[0].MaterialType = DIFFUSE_REFLECTION;
 
-	materials[1].Color = vec3(1.0, 1.0, 1.0);
+	materials[1].Color = vec3(1.0, 0, 0);
 	materials[1].LightCoeffs = vec4(lightCoefs);
 	materials[1].ReflectionCoef = 0.5;
 	materials[1].RefractionCoef = 1.0;
-	materials[1].MaterialType = DIFFUSE;
+	materials[1].MaterialType = DIFFUSE_REFLECTION;
 
-	materials[2].Color = vec3(1.0, 0.0, 0.0);
+	materials[2].Color = vec3(1.0, 1.0, 1.0);
 	materials[2].LightCoeffs = vec4(lightCoefs);
 	materials[2].ReflectionCoef = 0.5;
 	materials[2].RefractionCoef = 1.0;
-	materials[2].MaterialType = DIFFUSE;
+	materials[2].MaterialType = DIFFUSE_REFLECTION;
 
 	materials[3].Color = vec3(0.0, 0.0, 1.0);
 	materials[3].LightCoeffs = vec4(lightCoefs);
 	materials[3].ReflectionCoef = 0.5;
 	materials[3].RefractionCoef = 1.0;
-	materials[3].MaterialType = DIFFUSE;
+	materials[3].MaterialType = DIFFUSE_REFLECTION;
 
 	materials[4].Color = vec3(1.0, 1.0, 0.0);
 	materials[4].LightCoeffs = vec4(lightCoefs);
 	materials[4].ReflectionCoef = 0.5;
 	materials[4].RefractionCoef = 1.0;
-	materials[4].MaterialType = DIFFUSE;
+	materials[4].MaterialType = DIFFUSE_REFLECTION;
 
 	materials[5].Color = vec3(0.0, 1.0, 1.0);
 	materials[5].LightCoeffs = vec4(lightCoefs);
 	materials[5].ReflectionCoef = 0.5;
 	materials[5].RefractionCoef = 1.0;
-	materials[5].MaterialType = DIFFUSE;
+	materials[5].MaterialType = MIRROR_REFLECTION;
 }
 
 bool Raytrace ( SRay ray, float start, float final, out SIntersection intersect )
@@ -334,7 +341,7 @@ vec3 Phong ( SIntersection intersect, SLight currLight)
 	float specular = pow(max(dot(reflected, light), 0.0), intersect.LightCoeffs.w);
 	
 	vec3 t = intersect.LightCoeffs.x * intersect.Color 
-		+ intersect.LightCoeffs.y * diffuse * intersect.Color 
+		+ intersect.LightCoeffs.y * diffuse * intersect.Color * shadow
 		+ intersect.LightCoeffs.z * specular;
 
 	if (((t.x == 0) && (t.y == 0) && (t.z == 0)))
@@ -365,6 +372,37 @@ float Shadow(SLight currLight, SIntersection intersect)
 	return shadowing;
 }
 
+// ------------ stack -----------
+int top;
+STracingRay stack[MAX_RAY_DEPTH];
+
+void pushRay(STracingRay ray)
+{
+    stack[top] = ray;
+    top++;
+}
+
+STracingRay popRay()
+{
+	top--;
+    return stack[top];
+}
+
+STracingRay topRay()
+{
+    return stack[top-1];
+}
+
+bool isEmpty()
+{
+    return top == 0;
+}
+bool isFull()
+{
+	return top == MAX_RAY_DEPTH;
+}
+// --------- stack --------------
+
 void main ()
 {
 	float start = 0;
@@ -377,11 +415,47 @@ void main ()
 	vec3 resultColor = vec3(0,0,0);
 	initializeDefaultScene();
 	initializeDefaultLightMaterials();
-	
-	if (Raytrace(ray, start, final, intersect))
+
+	STracingRay trRay = STracingRay(ray, 1, 0);
+	pushRay(trRay);
+	while(!isEmpty())
 	{
-		shadow = Shadow(uLight, intersect);
-		resultColor += Phong( intersect, uLight);
+		STracingRay trRay = popRay();
+		ray = trRay.ray;
+		SIntersection intersect;
+		intersect.Time = BIG;
+		start = 0;
+		final = BIG;
+		if (Raytrace(ray, start, final, intersect))
+		{
+			switch(intersect.MaterialType)
+			{
+				case DIFFUSE_REFLECTION:
+				{
+					shadow = Shadow(uLight, intersect);
+					resultColor += trRay.contribution * Phong ( intersect, uLight );
+					break;
+				}
+				case MIRROR_REFLECTION:
+				{
+					if(intersect.ReflectionCoef < 1)
+					{
+						float contribution = trRay.contribution * (1 - intersect.ReflectionCoef);
+						shadow = Shadow(uLight, intersect);
+						resultColor += contribution * Phong(intersect, uLight);
+					}
+					if (trRay.depth + 1 >= MAX_RAY_DEPTH || isFull()) break;
+
+					vec3 reflectDirection = reflect(ray.Direction, intersect.Normal);
+					float contribution = trRay.contribution * intersect.ReflectionCoef;
+					STracingRay reflectRay = STracingRay(
+					SRay(intersect.Point + reflectDirection * EPSILON, reflectDirection),
+					contribution, trRay.depth + 1);
+					pushRay(reflectRay);
+					break;
+				}
+			}
+		} 
 	}
 	FragColor = vec4 (resultColor, 1.0);
 }
