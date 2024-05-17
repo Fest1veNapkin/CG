@@ -88,6 +88,7 @@ SMaterial materials[6];
 SCamera uCamera;
 float shadow;
 
+// using default camera in GAME.CS
 SCamera initializeDefaultCamera()
 {
 	SCamera camera;
@@ -95,7 +96,6 @@ SCamera initializeDefaultCamera()
 	camera.View = vec3(0.0, 0.0, 1.0);
 	camera.Up = vec3(0.0, 1.0, 0.0);
 	camera.Side = vec3(1.0, 0.0, 0.0);
-	// can not work
 	camera.Scale = vec2(1.0);
 	return camera;
 }
@@ -245,7 +245,7 @@ bool IntersectTriangle (SRay ray, vec3 v1, vec3 v2, vec3 v3, out float time )
 void initializeDefaultLightMaterials()
 {
 	uLight.Position = vec3(0.0, 2.0, -4.0f);
-	vec4 lightCoefs = vec4(1,0.5,1,2.0);
+	vec4 lightCoefs = vec4(0.5, 0.5, 1.0, 2.0);
 
 	materials[0].Color = vec3(0, 1.0, 0);
 	materials[0].LightCoeffs = vec4(lightCoefs);
@@ -343,11 +343,6 @@ vec3 Phong ( SIntersection intersect, SLight currLight)
 	vec3 t = intersect.LightCoeffs.x * intersect.Color 
 		+ intersect.LightCoeffs.y * diffuse * intersect.Color * shadow
 		+ intersect.LightCoeffs.z * specular;
-
-	if (((t.x == 0) && (t.y == 0) && (t.z == 0)))
-	{
-		return vec3(1, 0, 0);
-	}
 
 	return intersect.LightCoeffs.x * intersect.Color 
 		+ intersect.LightCoeffs.y * diffuse * intersect.Color 
